@@ -1,0 +1,25 @@
+configuration:
+  since_hours:
+    name: Analysis window (hours)
+    description: How many hours of messages go into the report.
+  top:
+    name: Findings shown
+    description: Maximum number of patterns in the ranking.
+  min_score:
+    name: Minimum score for external lookups
+    description: Findings below this importance do not trigger web searches.
+  min_severity:
+    name: Minimum severity stored
+    description: 0 = emergencies only, 7 = store everything received.
+  web:
+    name: Search external references
+    description: Turn off to keep the app fully offline.
+  refresh_minutes:
+    name: Refresh interval (minutes)
+    description: How often the report is regenerated.
+  event_type:
+    name: Home Assistant event
+    description: Bus event to subscribe to; defaults to the syslog_receiver one.
+  ingress_port:
+    name: Panel port
+    description: Internal port serving the report.

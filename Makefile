@@ -6,7 +6,7 @@ test:
 	python3 -m pytest -q
 
 coverage:
-	python3 -m coverage run --source=src -m pytest -q
+	python3 -m coverage run --source=src,scripts -m pytest -q
 	mkdir -p coverage
 	python3 -m coverage lcov -o coverage/lcov.info
 	python3 -m coverage report -m

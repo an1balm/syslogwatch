@@ -1,0 +1,25 @@
+configuration:
+  since_hours:
+    name: Ventana de análisis (horas)
+    description: Cuántas horas de mensajes entran en el informe.
+  top:
+    name: Hallazgos mostrados
+    description: Número máximo de patrones en el ranking.
+  min_score:
+    name: Nota mínima para buscar fuera
+    description: Por debajo de esta importancia no se consultan buscadores externos.
+  min_severity:
+    name: Severidad mínima a guardar
+    description: 0 = sólo emergencias, 7 = guardar todo lo que llegue.
+  web:
+    name: Buscar referencias en Internet
+    description: Desactívalo si no quieres que el add-on salga a la red.
+  refresh_minutes:
+    name: Cada cuántos minutos regenerar
+    description: Frecuencia de actualización del informe.
+  event_type:
+    name: Evento de Home Assistant
+    description: Evento del bus al que suscribirse; por defecto el de syslog_receiver.
+  ingress_port:
+    name: Puerto del panel
+    description: Puerto interno donde sirve el informe.

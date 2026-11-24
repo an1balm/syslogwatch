@@ -44,6 +44,32 @@ routers/APs ──UDP 514──▶ syslogwatch listen ──▶ SQLite (eventos 
 
 ## Instalación
 
+Hay dos formas de usarlo:
+
+| Forma | Cuándo | Qué necesitas |
+| --- | --- | --- |
+| **Add-on de Home Assistant** (recomendada) | Ya tienes `syslog_receiver` recibiendo logs | Nada: usa el receptor y el bus de eventos de HA |
+| CLI / colector propio | Sin HA, o para analizar un log suelto | Que los equipos apunten su syslog a esta máquina |
+
+### Add-on de Home Assistant
+
+```bash
+python3 scripts/build_addon.py --zip     # genera dist/syslogwatch/ y el zip
+```
+
+Copia `dist/syslogwatch/` en el directorio `/addons` de tu instalación (Samba,
+SSH o el editor de ficheros), recarga la tienda de add-ons e instálalo. Aparecerá
+un panel **Syslogwatch** en la barra lateral con el informe.
+
+El add-on se suscribe por WebSocket al evento `syslog_receiver_message` con el
+token del Supervisor: no abre puertos, no toca los routers y no compite con el
+receptor que ya funciona. Si el add-on se para, los mensajes de ese rato no se
+recuperan — el bus de HA no guarda histórico.
+
+Opciones, requisitos y límites: [`addon/DOCS.md`](addon/DOCS.md).
+
+### CLI
+
 ```bash
 cd syslogwatch
 python3 -m pip install --user -e .        # deja el comando `syslogwatch` en el PATH
@@ -121,10 +147,11 @@ Estado medido en el sandbox (Python 3.13, verificado el 24-nov-2026):
 
 | Gate | Resultado |
 | --- | --- |
-| pytest | 140 tests, cobertura 95 % |
-| crapper | peor CRAP 8.0 (umbral 10) |
+| pytest | 197 tests, cobertura 94 % |
+| crapper | peor CRAP 8.1 (umbral 10) |
 | dryer | 0 duplicados ≥ 0.82 |
 | mutator | 195/207 mutantes muertos (94 %); 100 % en `parse`, `rank` y `rules` |
+| protocolo HA | cliente WebSocket propio (RFC 6455) probado contra un servidor que habla el protocolo: handshake, fragmentación, ping/pong, cierre y reconexión |
 
 Los 12 supervivientes están en la capa de E/S: inicializaciones de banderas
 (`_running`, `degraded`), contadores que nadie observa, el `start=1` de una tabla

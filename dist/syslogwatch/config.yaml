@@ -1,0 +1,42 @@
+name: Syslogwatch
+version: "0.1.0"
+slug: syslogwatch
+description: Analiza el syslog que ya recibe Home Assistant, prioriza los fallos y busca referencias externas
+url: https://github.com/an1balm/syslogwatch
+arch:
+  - aarch64
+  - amd64
+  - armv7
+init: false
+startup: application
+boot: auto
+homeassistant_api: true
+hassio_api: true
+ingress: true
+ingress_port: 8099
+ingress_entry: /
+ports:
+  8099/tcp: null
+ports_description:
+  8099/tcp: Panel directo (opcional, sólo si quieres abrirlo fuera de la barra lateral)
+panel_icon: mdi:script-text-outline
+panel_title: Syslogwatch
+watchdog: http://[HOST]:[PORT:8099]/healthz
+options:
+  since_hours: 24
+  top: 15
+  min_score: 40
+  min_severity: 7
+  web: true
+  refresh_minutes: 30
+  event_type: syslog_receiver_message
+  ingress_port: 8099
+schema:
+  since_hours: int(1,720)
+  top: int(1,100)
+  min_score: int(0,100)
+  min_severity: int(0,7)
+  web: bool
+  refresh_minutes: int(1,1440)
+  event_type: str
+  ingress_port: port
