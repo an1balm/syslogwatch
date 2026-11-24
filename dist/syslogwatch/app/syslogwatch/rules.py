@@ -368,6 +368,40 @@ RULES: Tuple[Rule, ...] = (
         refs=(),
     ),
     Rule(
+        id="crond-task",
+        title="Tarea programada ejecutada por cron",
+        pattern=r"crond?\s+(USER|cron)\s+\w+.*\b(cmd|command)\b",
+        category="ruido",
+        weight=6,
+        cause=(
+            "El planificador del equipo lanza un script de mantenimiento (rtspStream.sh, "
+            "quarterHour.sh…). Es la prueba de que cron funciona."
+        ),
+        fix=(
+            "Nada, salvo que veas scripts que no reconoces: entonces conviene revisar "
+            "/etc/crontabs/root del equipo por si el firmware trae algo que no esperabas."
+        ),
+        query="busybox crond USER root pid cmd scheduled script log",
+        refs=(),
+    ),
+    Rule(
+        id="wifi-roaming-trigger",
+        title="El AP fuerza el roaming de un cliente (señal)",
+        pattern=r"Triggered [0-9A-Fa-f:]{17}.*rssi=(-?\d+).*rssi=(-?\d+)",
+        category="wifi",
+        weight=30,
+        cause=(
+            "El punto de acceso decide mover al cliente a otra banda o nodo porque su señal "
+            "baja del umbral (last_rssi) y encuentra otra mejor (current_rssi)."
+        ),
+        fix=(
+            "Normal mientras el cliente se mueve. Si pasa cada pocos minutos con un equipo "
+            "fijo, está entre dos nodos: fija ese cliente a la banda de 2,4 GHz o acerca un AP."
+        ),
+        query="wifi AP triggered client rssi roaming steering threshold",
+        refs=(),
+    ),
+    Rule(
         id="config-save-ok",
         title="Guardado de configuración correcto",
         pattern=r"(saving|saved) config|configuration saved|config.*saved ok",
@@ -381,7 +415,7 @@ RULES: Tuple[Rule, ...] = (
     Rule(
         id="zcmd-noise",
         title="Ruido interno del router (zcmdModuleCfg / radvd)",
-        pattern=r"zcmd[A-Za-z]*|beRaInfo|radvd.*received RS|mapping parameter",
+        pattern=r"zcmd[A-Za-z]*|beRaInfo|beIpIfaceStats|radvd.*received RS|mapping parameter",
         category="ruido",
         weight=8,
         cause=(

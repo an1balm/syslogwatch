@@ -84,3 +84,21 @@ def test_cloud_connection_lost_is_not_unclassified():
 
     rule = match_rule(parse_line("Nov 24 15:29:00 daemon.warning mqtt: cloud connection lost, retrying in 30s", source_ip="192.168.1.1"))
     assert rule.id == "cloud-disconnect"
+
+
+def test_cron_tasks_and_rssi_roaming_from_the_real_network_are_classified():
+    from syslogwatch.rules import match_rule
+
+    cron = match_rule(parse_line("Nov 24 17:18:00 user.info crond: USER root pid 6478 cmd /usr/etc/rtspStream.sh",
+                                 source_ip="192.168.1.1"))
+    rssi = match_rule(parse_line("Nov 24 17:19:00 user.info hostapd: Triggered 74:AB:93:DE:07:32 last_rssi=20 current_rssi=28",
+                                 source_ip="192.168.1.153"))
+    assert cron.id == "crond-task" and cron.category == "ruido"
+    assert rssi.id == "wifi-roaming-trigger" and rssi.category == "wifi"
+
+
+def test_platform_stats_from_the_router_stay_as_noise():
+    from syslogwatch.rules import match_rule
+
+    regla = match_rule(parse_line("Nov 24 17:18:01 user.err zcmdModuleCfg: beIpIfaceStatsUpdate()", source_ip="192.168.1.1"))
+    assert regla.id == "zcmd-noise"

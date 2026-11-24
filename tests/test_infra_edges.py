@@ -32,7 +32,9 @@ def test_add_with_no_entries_returns_zero(tmp_path):
 
 def test_since_datetime_filters_exactly(tmp_path):
     store = Store(tmp_path / "t.db")
-    store.add([parse_line("Nov 24 15:20:00 daemon.err dhcpd: no free leases", source_ip="192.168.1.1")])
+    # sin fecha en la línea: el almacén usa el instante de recepción, así el test
+    # no depende de la hora a la que se ejecute
+    store.add([parse_line("texto sin fecha ni nivel", source_ip="192.168.1.1")])
     future = datetime.now() + timedelta(hours=1)
     assert store.entries(since=future) == []
     past = datetime.now() - timedelta(hours=1)
