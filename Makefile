@@ -1,12 +1,12 @@
 .PHONY: test gates coverage demo report clean
 
-export PYTHONPATH := src
+export PYTHONPATH := addon/app
 
 test:
 	python3 -m pytest -q
 
 coverage:
-	python3 -m coverage run --source=src,scripts -m pytest -q
+	python3 -m coverage run --source=addon/app,scripts -m pytest -q
 	mkdir -p coverage
 	python3 -m coverage lcov -o coverage/lcov.info
 	python3 -m coverage report -m

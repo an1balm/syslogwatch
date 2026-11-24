@@ -76,7 +76,7 @@ python3 -m pip install --user -e .        # deja el comando `syslogwatch` en el 
 syslogwatch --help
 ```
 
-O sin instalar: `PYTHONPATH=src python3 -m syslogwatch.cli ...`
+O sin instalar: `PYTHONPATH=addon/app python3 -m syslogwatch.cli ...`
 
 ## Uso
 
@@ -160,7 +160,7 @@ cobertura (≥ 92 % en todos esos módulos) y los tests de comportamiento.
 
 ## Añadir patrones
 
-Abre `src/syslogwatch/rules.py` y añade una `Rule` **antes** de `unclassified`
+Abre `addon/app/syslogwatch/rules.py` y añade una `Rule` **antes** de `unclassified`
 (el orden es la prioridad). Un test honesto primero:
 
 ```python

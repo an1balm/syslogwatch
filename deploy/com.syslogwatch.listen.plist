@@ -25,7 +25,7 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>PYTHONPATH</key>
-        <string>__PROJECT__/src</string>
+        <string>__PROJECT__/addon/app</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>

@@ -13,8 +13,8 @@ dependencies = []
 syslogwatch = "syslogwatch.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["addon/app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["addon/app"]

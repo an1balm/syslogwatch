@@ -12,3 +12,5 @@ referencias.json
 .venv/
 target/
 .coverage
+dist/
+.metrics/

@@ -9,7 +9,7 @@
     <array>
         <string>/bin/sh</string>
         <string>-c</string>
-        <string>mkdir -p "$HOME/Documents/syslogwatch" &amp;&amp; PYTHONPATH="__PROJECT__/src" python3 -m syslogwatch.cli analyze --since 24h --format html -o "$HOME/Documents/syslogwatch/informe.html" &amp;&amp; PYTHONPATH="__PROJECT__/src" python3 -m syslogwatch.cli analyze --since 24h --format markdown -o "$HOME/Documents/syslogwatch/informe.md"</string>
+        <string>mkdir -p "$HOME/Documents/syslogwatch" &amp;&amp; PYTHONPATH="__PROJECT__/addon/app" python3 -m syslogwatch.cli analyze --since 24h --format html -o "$HOME/Documents/syslogwatch/informe.html" &amp;&amp; PYTHONPATH="__PROJECT__/addon/app" python3 -m syslogwatch.cli analyze --since 24h --format markdown -o "$HOME/Documents/syslogwatch/informe.md"</string>
     </array>
     <key>StartCalendarInterval</key>
     <dict>
