@@ -147,7 +147,7 @@ Estado medido en el sandbox (Python 3.13, verificado el 24-nov-2026):
 
 | Gate | Resultado |
 | --- | --- |
-| pytest | 209 tests, cobertura 94 % |
+| pytest | 211 tests, cobertura 94 % |
 | crapper | peor CRAP 8.1 (umbral 10) |
 | dryer | 0 duplicados ≥ 0.82 |
 | mutator | 195/207 mutantes muertos (94 %); 100 % en `parse`, `rank` y `rules` |

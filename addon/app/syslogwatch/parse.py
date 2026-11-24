@@ -154,10 +154,18 @@ def _apply_tag(text: str, entry: dict) -> None:
     if not match:
         entry["message"] = text.strip()
         return
-    entry["app"] = match.group("app")
+    app = match.group("app")
+    entry["app"] = app
     if match.group("pid"):
         entry["pid"] = int(match.group("pid"))
-    entry["message"] = match.group("msg").strip()
+    message = match.group("msg").strip()
+    # Algunos firmwares repiten la etiqueta dentro del mensaje
+    # («cron.info crond: crond: USER root …»): se colapsa para no ensuciar el texto.
+    for prefix in (app + ":", app + " :"):
+        if message.lower().startswith(prefix.lower()):
+            message = message[len(prefix):].strip()
+            break
+    entry["message"] = message
 
 
 def _apply_pri(text: str, entry: dict) -> str:

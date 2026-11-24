@@ -370,7 +370,7 @@ RULES: Tuple[Rule, ...] = (
     Rule(
         id="crond-task",
         title="Tarea programada ejecutada por cron",
-        pattern=r"crond?\s+(USER|cron)\s+\w+.*\b(cmd|command)\b",
+        pattern=r"crond?:?\s+(USER|cron)\s+\w+.*\b(cmd|command)\b",
         category="ruido",
         weight=6,
         cause=(

@@ -102,3 +102,11 @@ def test_platform_stats_from_the_router_stay_as_noise():
 
     regla = match_rule(parse_line("Nov 24 17:18:01 user.err zcmdModuleCfg: beIpIfaceStatsUpdate()", source_ip="192.168.1.1"))
     assert regla.id == "zcmd-noise"
+
+
+def test_the_doubled_tag_from_the_real_router_matches_the_cron_rule():
+    from syslogwatch.rules import match_rule
+
+    regla = match_rule(parse_line("Nov 24 17:26:01 cron.info crond: crond: USER root pid 14989 cmd /usr/etc/quarterHour.sh",
+                                  source_ip="192.168.1.1"))
+    assert regla.id == "crond-task"

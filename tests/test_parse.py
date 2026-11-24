@@ -74,3 +74,12 @@ def test_unparseable_text_is_kept_as_message_not_dropped():
 
 def test_blank_line_is_ignored():
     assert parse_line("   \n", source_ip="10.0.0.9") is None
+
+
+def test_a_tag_repeated_inside_the_message_is_collapsed():
+    # línea real del router Digi: «cron.info crond: crond: USER root pid …»
+    e = parse_line("Nov 24 17:26:01 cron.info crond: crond: USER root pid 14989 cmd /usr/etc/quarterHour.sh",
+                   source_ip="192.168.1.1")
+    assert e.app == "crond"
+    assert e.message == "USER root pid 14989 cmd /usr/etc/quarterHour.sh"
+    assert e.facility == 9  # cron
