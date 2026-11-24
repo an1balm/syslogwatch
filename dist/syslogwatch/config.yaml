@@ -1,5 +1,5 @@
 name: Syslogwatch
-version: "0.1.6"
+version: "0.1.7"
 slug: syslogwatch
 description: Analiza el syslog que ya recibe Home Assistant, prioriza los fallos y busca referencias externas
 url: https://github.com/an1balm/syslogwatch

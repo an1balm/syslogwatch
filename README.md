@@ -23,7 +23,7 @@ routers/APs ──UDP 514──▶ syslogwatch listen ──▶ SQLite (eventos 
    propietarios que se ven en la práctica (Zyxel escribe `user.info zcmdModuleCfg:`,
    los D-Link COVR escriben `kernel:` sin nivel). Se guardan eventos crudos, nunca
    conclusiones: puedes reescribir el catálogo y reclasificar el histórico.
-2. **Clasifica** (`rules.py`): 27 patrones con categoría, peso, causa y remedio.
+2. **Clasifica** (`rules.py`): 28 patrones con categoría, peso, causa y remedio.
    Lo que no coincide cae en `unclassified` y se busca fuera.
 3. **Prioriza** (`rank.py`):
 
@@ -147,7 +147,7 @@ Estado medido en el sandbox (Python 3.13, verificado el 24-nov-2026):
 
 | Gate | Resultado |
 | --- | --- |
-| pytest | 214 tests, cobertura 94 % |
+| pytest | 216 tests, cobertura 94 % |
 | crapper | peor CRAP 8.1 (umbral 10) |
 | dryer | 0 duplicados ≥ 0.82 |
 | mutator | 195/207 mutantes muertos (94 %); 100 % en `parse`, `rank` y `rules` |

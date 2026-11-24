@@ -454,6 +454,23 @@ RULES: Tuple[Rule, ...] = (
         refs=(),
     ),
     Rule(
+        id="wifi-station-table",
+        title="Tabla de clientes Wi-Fi volcada por el AP",
+        pattern=r"Station\s+(Num|\d+)|addr: [0-9a-f:]{12,17}|\b(rssi|snr|noise)=-?\d+",
+        category="ruido",
+        weight=8,
+        cause=(
+            "El AP envía su tabla de clientes asociados línea a línea (número, MAC, RSSI). "
+            "Es un volcado periódico, no un aviso."
+        ),
+        fix=(
+            "Nada. Si quieres ver la señal de un cliente concreto, fíjate en su rssi: por "
+            "debajo de -75 dBm conviene mover el nodo o el equipo."
+        ),
+        query="wifi station table rssi snr dlink log dump",
+        refs=(),
+    ),
+    Rule(
         id="config-save-ok",
         title="Guardado de configuración correcto",
         pattern=r"(saving|saved) config|configuration saved|config.*saved ok",
@@ -516,7 +533,7 @@ UNCLASSIFIED = Rule(
     title="Mensaje sin patrón conocido",
     pattern=r".*",
     category="desconocido",
-    weight=50,
+    weight=30,  # desconocido ≠ grave: no debe tapar un fallo identificado
     cause="No hay patrón curado para este mensaje: se busca en foros y en el código del firmware.",
     fix=(
         "Usa las referencias externas para localizarlo; si se repite, añade una regla nueva al "

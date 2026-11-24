@@ -142,3 +142,26 @@ def test_the_wifi_association_rule_covers_the_handshake_traces():
         "Nov 24 17:30:02 user.info hostapd: wlan0: Station Connect Statistic...",
     ):
         assert match_rule(parse_line(linea, source_ip="192.168.1.153")).id == "wifi-client-associated"
+
+
+def test_the_station_table_dump_is_noise():
+    from syslogwatch.rules import match_rule
+
+    for linea in (
+        "Nov 24 17:36:00 user.info hostapd: wlan0:   Station Num: 1",
+        "Nov 24 17:36:00 user.info hostapd: wlan0:   Station  0:",
+        "Nov 24 17:36:00 user.info hostapd: wlan0:     addr: 0a574166abd9",
+    ):
+        assert match_rule(parse_line(linea, source_ip="192.168.1.153")).id == "wifi-station-table"
+
+
+def test_an_unknown_message_cannot_outrank_a_known_failure():
+    from syslogwatch.parse import parse_line as p
+    from syslogwatch.rank import aggregate
+
+    desconocido = aggregate([p("Nov 24 17:36:00 user.info algo: mensaje raro %d" % i, source_ip="192.168.1.1")
+                             for i in range(200)])[0]
+    conocido = aggregate([p("Nov 24 17:36:00 kern.err kernel: nf_conntrack: table full, dropping packet",
+                            source_ip="192.168.1.1")])[0]
+    assert desconocido.rule.id == "unclassified"
+    assert conocido.score > desconocido.score
