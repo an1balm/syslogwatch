@@ -1,0 +1,14 @@
+__pycache__/
+*.py[co]
+*.egg-info/
+.pytest_cache/
+.metrics/
+coverage/
+coverage.lcov
+*.db
+informe*.html
+informe*.md
+referencias.json
+.venv/
+target/
+.coverage

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Colector de syslog. Se instala como LaunchAgent (puerto 5514) o, para el 514
+  que exigen los D-Link, como LaunchDaemon con el flag as-root de install-macos.sh.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.syslogwatch.listen</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/env</string>
+        <string>python3</string>
+        <string>-m</string>
+        <string>syslogwatch.cli</string>
+        <string>listen</string>
+        <string>--port</string>
+        <string>__PORT__</string>
+        <string>--db</string>
+        <string>__HOME__/.syslogwatch/events.db</string>
+        <string>--forward</string>
+        <string>__FORWARD__</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>__PROJECT__/src</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.syslogwatch/listen.err.log</string>
+    <key>StandardOutPath</key>
+    <string>__HOME__/.syslogwatch/listen.out.log</string>
+</dict>
+</plist>
