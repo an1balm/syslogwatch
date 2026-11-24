@@ -22,8 +22,11 @@ from .enrich import ReferenceResolver
 from .ha_source import DEFAULT_EVENT, run_stream
 from .parse import SyslogEntry
 from .rank import aggregate
+from .rules import RULES
 from .report import Report, render_html, render_markdown
 from .store import Store
+
+VERSION = "0.1.3"
 
 SUPERVISOR_URL = "http://supervisor/core"
 SUPERVISOR_TOKEN_ENV = "SUPERVISOR_TOKEN"
@@ -188,6 +191,8 @@ class ReportService:
         stats = self.store.stats()
         return {
             "ok": self.last_error is None,
+            "version": VERSION,
+            "patrones": len(RULES),
             "eventos": stats["total"],
             "por_dispositivo": stats["by_device"],
             "ultimo_mensaje": stats["newest"].isoformat(sep=" ") if stats["newest"] else None,
@@ -281,7 +286,7 @@ def start_ingest(
 
 
 def main() -> int:  # pragma: no cover - lo arranca el contenedor
-    logger = lambda message: print(f"[syslogwatch] {message}", flush=True)  # noqa: E731
+    logger = lambda message: print(f"[syslogwatch {VERSION}] {message}", flush=True)  # noqa: E731
     options = load_options()
     Path(options.data_dir).mkdir(parents=True, exist_ok=True)
     store = Store(options.db_path)

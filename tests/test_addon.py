@@ -124,7 +124,7 @@ def test_window_limits_what_the_report_looks_at(tmp_path):
     old = datetime.now() - timedelta(days=3)
     # sin fecha en la línea: el almacén usa el momento de recepción, que aquí es antiguo
     store.add([_entry("no free leases en el pool desde ayer")], received_at=old)
-    store.add([_entry("Nov 24 15:22:00 kern.err kernel: nf_conntrack: table full")])
+    store.add([_entry("nf_conntrack: table full, dropping packet")])
     report = service.build()
     assert report.window == "últimas 1 h"
     assert report.total_events == 1
@@ -307,4 +307,15 @@ def test_health_without_findings_reports_null_priority(tmp_path):
     service, store, _ = _service(tmp_path)
     service.refresh()
     assert service.health()["prioridad_maxima"] is None
+    store.close()
+
+
+def test_health_exposes_the_running_version_and_rule_count(tmp_path):
+    from syslogwatch.addon_main import VERSION
+    from syslogwatch.rules import RULES
+
+    service, store, _ = _service(tmp_path)
+    health = service.health()
+    assert health["version"] == VERSION
+    assert health["patrones"] == len(RULES) >= 24
     store.close()

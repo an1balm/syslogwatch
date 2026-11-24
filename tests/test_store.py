@@ -41,8 +41,10 @@ def test_entries_round_trip_with_their_fields(tmp_path):
 def test_since_filter_uses_the_stored_timestamp(tmp_path):
     store = Store(tmp_path / "t.db")
     old = datetime.now() - timedelta(days=3)
-    store.add([_e("Nov 24 15:20:00 daemon.err dhcpd: no free leases", now=old)])
-    store.add([_e("Nov 24 15:22:00 kern.err kernel: Out of memory: Killed process 9")])
+    # líneas sin fecha: el almacén usa el instante de recepción, así el test no
+    # depende de la hora a la que se ejecute
+    store.add([_e("no free leases desde hace días")], received_at=old)
+    store.add([_e("Out of memory: Killed process 9")])
     recent = store.entries(since=timedelta(hours=1))
     assert len(recent) == 1
     assert recent[0].message.startswith("Out of memory")
