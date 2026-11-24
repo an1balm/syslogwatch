@@ -23,7 +23,7 @@ routers/APs ──UDP 514──▶ syslogwatch listen ──▶ SQLite (eventos 
    propietarios que se ven en la práctica (Zyxel escribe `user.info zcmdModuleCfg:`,
    los D-Link COVR escriben `kernel:` sin nivel). Se guardan eventos crudos, nunca
    conclusiones: puedes reescribir el catálogo y reclasificar el histórico.
-2. **Clasifica** (`rules.py`): 20 patrones con categoría, peso, causa y remedio.
+2. **Clasifica** (`rules.py`): 22 patrones con categoría, peso, causa y remedio.
    Lo que no coincide cae en `unclassified` y se busca fuera.
 3. **Prioriza** (`rank.py`):
 
@@ -121,10 +121,15 @@ Estado medido en el sandbox (Python 3.13, verificado el 24-nov-2026):
 
 | Gate | Resultado |
 | --- | --- |
-| pytest | 90 tests, cobertura 91 % |
-| crapper | peor CRAP 8.9 (umbral 10) |
+| pytest | 136 tests, cobertura 95 % |
+| crapper | peor CRAP 8.0 (umbral 10) |
 | dryer | 0 duplicados ≥ 0.82 |
-| mutator | 56/56 mutantes muertos en parse/rank/rules (100 %) |
+| mutator | 100 % de mutantes muertos en `parse`, `rank` y `rules` (56/56) |
+
+En la capa de entrada/salida (`cli`, `store`, `sources`, `report`) sobreviven ~1 de
+cada 4 mutantes: son contadores, banderas de arranque y comparaciones cuyo cambio
+no altera ninguna salida observable. Ahí el gate que manda es la cobertura (≥ 92 %
+en todos esos módulos) y los tests de comportamiento de arriba.
 
 ## Añadir patrones
 
