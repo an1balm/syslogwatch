@@ -110,3 +110,24 @@ def test_the_doubled_tag_from_the_real_router_matches_the_cron_rule():
     regla = match_rule(parse_line("Nov 24 17:26:01 cron.info crond: crond: USER root pid 14989 cmd /usr/etc/quarterHour.sh",
                                   source_ip="192.168.1.1"))
     assert regla.id == "crond-task"
+
+
+def test_the_three_patterns_that_were_unclassified_in_production():
+    from syslogwatch.rules import match_rule
+
+    casos = {
+        "Nov 24 17:29:00 user.info syslog-ng: Log statistics; dropped='udp(AF_INET(192.168.1.219:514))=0', "
+        "processed='center(queued)=31186'": "syslog-stats",
+        "Nov 24 17:28:00 user.info wlan: rtk_multi_ap_recordUnassocStaMetric - measurement still ongoing": "rtk-metrics",
+        "Nov 24 17:27:00 user.info hostapd: wlan0: A wireless client is associated - 0A:57:41:66:AB:D9": "wifi-client-associated",
+    }
+    for linea, esperado in casos.items():
+        assert match_rule(parse_line(linea, source_ip="192.168.1.153")).id == esperado, linea
+
+
+def test_the_three_new_rules_are_noise_level_except_the_wifi_one():
+    from syslogwatch.rules import rule_by_id
+
+    assert rule_by_id("syslog-stats").weight <= 10
+    assert rule_by_id("rtk-metrics").weight <= 10
+    assert rule_by_id("wifi-client-associated").category == "wifi"

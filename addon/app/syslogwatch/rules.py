@@ -402,6 +402,54 @@ RULES: Tuple[Rule, ...] = (
         refs=(),
     ),
     Rule(
+        id="syslog-stats",
+        title="Estadística periódica del reenviador syslog",
+        pattern=r"Log statistics;|dropped='|processed='",
+        category="ruido",
+        weight=5,
+        cause=(
+            "El equipo reenvía su contador de mensajes cada pocos minutos. Sirve como "
+            "termómetro: con `dropped=0` no se está perdiendo nada por el camino."
+        ),
+        fix=(
+            "Nada que hacer si dropped es 0. Si aparece un número mayor, el destino no "
+            "acepta al ritmo que envía el equipo: sube el buffer o baja el nivel de log."
+        ),
+        query="syslog-ng log statistics dropped processed meaning",
+        refs=(),
+    ),
+    Rule(
+        id="rtk-metrics",
+        title="Medición interna del SDK Wi-Fi (Realtek)",
+        pattern=r"rtk_multi_ap|recordUnassocStaMetric|measurement still ongoing|rtk_",
+        category="ruido",
+        weight=6,
+        cause=(
+            "El SDK del chip Wi-Fi del AP toma métricas de clientes cercanos (802.11k) y avisa "
+            "de que la medición sigue en curso. No es un error."
+        ),
+        fix="Nada que hacer: es telemetría del propio AP.",
+        query="rtk_multi_ap recordUnassocStaMetric measurement still ongoing",
+        refs=(),
+    ),
+    Rule(
+        id="wifi-client-associated",
+        title="Cliente Wi-Fi asociado al AP",
+        pattern=r"wireless client is (associated|disassociated)|wlan\d+: A wireless client",
+        category="wifi",
+        weight=20,
+        cause=(
+            "Un cliente ha completado la asociación con el AP. Es la traza normal de que el "
+            "Wi-Fi funciona."
+        ),
+        fix=(
+            "Nada, salvo que el mismo equipo repita la asociación cada pocos minutos: "
+            "entonces tiene cobertura justa o el AP lo está echando por reintentos."
+        ),
+        query="hostapd wireless client associated disassociated repeat disconnect",
+        refs=(),
+    ),
+    Rule(
         id="config-save-ok",
         title="Guardado de configuración correcto",
         pattern=r"(saving|saved) config|configuration saved|config.*saved ok",
