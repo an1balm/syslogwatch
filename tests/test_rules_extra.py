@@ -131,3 +131,14 @@ def test_the_three_new_rules_are_noise_level_except_the_wifi_one():
     assert rule_by_id("syslog-stats").weight <= 10
     assert rule_by_id("rtk-metrics").weight <= 10
     assert rule_by_id("wifi-client-associated").category == "wifi"
+
+
+def test_the_wifi_association_rule_covers_the_handshake_traces():
+    from syslogwatch.rules import match_rule
+
+    for linea in (
+        "Nov 24 17:30:00 user.info hostapd: wlan0: WPA2-AES PSK authentication in progress...",
+        "Nov 24 17:30:01 user.info hostapd: wlan0: Open and authenticated",
+        "Nov 24 17:30:02 user.info hostapd: wlan0: Station Connect Statistic...",
+    ):
+        assert match_rule(parse_line(linea, source_ip="192.168.1.153")).id == "wifi-client-associated"

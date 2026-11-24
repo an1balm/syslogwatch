@@ -26,7 +26,7 @@ from .rules import RULES
 from .report import Report, render_html, render_markdown
 from .store import Store
 
-VERSION = "0.1.5"
+VERSION = "0.1.6"
 
 SUPERVISOR_URL = "http://supervisor/core"
 SUPERVISOR_TOKEN_ENV = "SUPERVISOR_TOKEN"

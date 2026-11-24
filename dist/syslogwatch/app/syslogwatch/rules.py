@@ -435,7 +435,11 @@ RULES: Tuple[Rule, ...] = (
     Rule(
         id="wifi-client-associated",
         title="Cliente Wi-Fi asociado al AP",
-        pattern=r"wireless client is (associated|disassociated)|wlan\d+: A wireless client",
+        pattern=(
+            r"wireless client is (associated|disassociated)|wlan\d+: A wireless client|"
+            r"WPA2?-?(AES|PSK|WPA) authentication in progress|Open and authenticated|"
+            r"Station Connect Statistic|authentication (in progress|completed)"
+        ),
         category="wifi",
         weight=20,
         cause=(
