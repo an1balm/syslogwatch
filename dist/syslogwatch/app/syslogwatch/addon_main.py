@@ -122,6 +122,8 @@ class ReportService:
         self.options = options
         self.logger = logger
         self.last_built: Optional[datetime] = None
+        self.last_findings = 0
+        self.top_finding: Optional[str] = None
         self.last_error: Optional[str] = None
         self.degraded = False
         self._lock = threading.Lock()
@@ -143,6 +145,11 @@ class ReportService:
                 degraded=self.degraded,
             )
             self.last_built = datetime.now()
+            self.last_findings = len(report.findings)
+            self.top_finding = (
+                f"{report.findings[0].rule.title} ({report.findings[0].score})"
+                if report.findings else None
+            )
             return report
 
     def refresh(self) -> str:
@@ -184,6 +191,8 @@ class ReportService:
             "eventos": stats["total"],
             "por_dispositivo": stats["by_device"],
             "ultimo_mensaje": stats["newest"].isoformat(sep=" ") if stats["newest"] else None,
+            "hallazgos": self.last_findings,
+            "prioridad_maxima": self.top_finding,
             "informe_generado": self.last_built.isoformat(sep=" ") if self.last_built else None,
             "ultimo_error": self.last_error,
             "busqueda_externa_degradada": self.degraded,

@@ -89,6 +89,10 @@ class WebSocket:
         return cls(sock, pending)
 
     # -- envío -----------------------------------------------------------
+    def set_timeout(self, timeout: Optional[float]) -> None:
+        """Ajusta el tiempo de espera de lectura (None = bloquear)."""
+        self.sock.settimeout(timeout)
+
     def send_text(self, text: str) -> None:
         self._send(OP_TEXT, text.encode("utf-8"))
 

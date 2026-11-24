@@ -221,3 +221,55 @@ def test_entries_reach_the_store_from_the_event_bus(tmp_path):
                    on_entry=lambda entry: store.add([entry]), max_events=2, sleep=lambda s: None)
     assert store.count() == 2
     store.close()
+
+
+def test_idle_channel_sends_pings_instead_of_reconnecting(monkeypatch):
+    """Un canal callado no es un canal roto: se pinga y se sigue."""
+    import socket as socket_module
+
+    stream = HomeAssistantStream("http://127.0.0.1:1", TOKEN, timeout=0.05)
+    sent = []
+    replies = [TimeoutError("silencio"), TimeoutError("silencio"), {"type": "event", "event": {"data": {
+        "message": "Nov 24 15:20:00 daemon.err dhcpd: no free leases", "source_ip": "192.168.1.1"}}}]
+
+    class FakeWs:
+        def send_ping(self, payload=b""):
+            sent.append(payload)
+
+    def fake_next():
+        item = replies.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    stream.ws = FakeWs()
+    monkeypatch.setattr(stream, "_next", fake_next)
+    events = list(stream.events(max_events=1))
+    assert len(events) == 1
+    assert sent == [b"keepalive", b"keepalive"]
+    assert stream.idle_pings == 0  # se reinicia al llegar un mensaje
+
+
+def test_a_channel_silent_after_several_pings_raises(monkeypatch):
+    stream = HomeAssistantStream("http://127.0.0.1:1", TOKEN, timeout=0.05)
+
+    class FakeWs:
+        def send_ping(self, payload=b""):
+            pass
+
+    def always_timeout():
+        raise TimeoutError("silencio")
+
+    stream.ws = FakeWs()
+    monkeypatch.setattr(stream, "_next", always_timeout)
+    with pytest.raises(HaError):
+        list(stream.events(max_events=1))
+
+
+def test_open_sets_the_read_timeout_for_long_lived_use(monkeypatch):
+    with FakeWsServer(ha_server([])) as server:
+        stream = HomeAssistantStream(server.url.replace("/api/websocket", ""), TOKEN).open()
+        try:
+            assert stream.ws.sock.gettimeout() == stream.timeout
+        finally:
+            stream.close()

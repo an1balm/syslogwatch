@@ -290,3 +290,21 @@ def test_start_ingest_launches_the_stream_thread(tmp_path):
     on_entry(_entry("Nov 24 15:20:01 kern.err kernel: nf_conntrack: table full"))
     assert store.count() == 1
     store.close()
+
+
+def test_health_includes_findings_and_top_priority(tmp_path):
+    service, store, _ = _service(tmp_path)
+    store.add([_entry("Nov 24 15:20:00 kern.crit kernel: Out of memory: Killed process 9")])
+    service.refresh()
+    health = service.health()
+    assert health["hallazgos"] >= 1
+    assert "Sin memoria" in health["prioridad_maxima"]
+    assert health["prioridad_maxima"].endswith(")")
+    store.close()
+
+
+def test_health_without_findings_reports_null_priority(tmp_path):
+    service, store, _ = _service(tmp_path)
+    service.refresh()
+    assert service.health()["prioridad_maxima"] is None
+    store.close()

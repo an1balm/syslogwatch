@@ -9,6 +9,7 @@ ningún router ni duplicar el receptor.
 from __future__ import annotations
 
 import json
+import socket
 import threading
 import time
 from dataclasses import dataclass
@@ -105,12 +106,16 @@ class HomeAssistantStream:
         self.first_id = first_id
         self.ws: Optional[WebSocket] = None
         self._next_id = first_id
+        self.idle_pings = 0
 
     # -- ciclo de vida ---------------------------------------------------
     def open(self) -> "HomeAssistantStream":
         self.ws = WebSocket.connect(derive_ws_url(self.url), timeout=self.timeout)
         self._authenticate()
         self.subscribe()
+        # a partir de aquí la conexión es de larga duración: la lectura expira y
+        # se resuelve con un ping, no reabriendo la sesión
+        self.ws.set_timeout(self.timeout)
         return self
 
     def close(self) -> None:
@@ -168,10 +173,23 @@ class HomeAssistantStream:
             # porque HA no envía eventos hasta confirmar la suscripción.
 
     def events(self, max_events: Optional[int] = None) -> Iterator[Dict]:
-        """Genera los `event` de HA que llegan por la suscripción."""
+        """Genera los `event` de HA que llegan por la suscripción.
+
+        Si el canal se queda callado se manda un ping para distinguir «no pasa nada»
+        de «la conexión está muerta»; tras varios silencios seguidos se levanta el
+        error y `run_stream` reconecta.
+        """
         served = 0
         while max_events is None or served < max_events:
-            message = self._next()
+            try:
+                message = self._next()
+            except (socket.timeout, TimeoutError):
+                self.idle_pings += 1
+                if self.idle_pings > 3:
+                    raise HaError("sin respuesta de HA tras varios pings")
+                self.ws.send_ping(b"keepalive")
+                continue
+            self.idle_pings = 0
             kind = message.get("type")
             if kind == "pong":
                 continue
