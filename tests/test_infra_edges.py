@@ -248,3 +248,59 @@ def test_missing_devices_render_as_a_dash_in_html():
 def test_json_keeps_non_ascii_readable():
     finding = aggregate([parse_line("Nov 24 15:20:00 kern.crit kernel: Out of memory: Killed process 9", source_ip="192.168.1.1")])[0]
     assert '"band": "CRÍTICO"' in to_json(Report(findings=[finding], total_events=1))
+
+
+def test_echo_shows_a_dash_when_the_message_has_no_program(tmp_path, capsys):
+    from syslogwatch.cli import _make_sink
+
+    store = Store(tmp_path / "x.db")
+    on_entry, flush = _make_sink(store, echo=True)
+    on_entry(parse_line("Nov 24 15:20:00 texto sin programa reconocible", source_ip="192.168.1.1"))
+    flush()
+    assert " -: texto sin programa" in capsys.readouterr().out
+    store.close()
+
+
+def test_listen_honours_its_duration_and_collects_while_waiting(tmp_path):
+    import socket as sock_mod
+    import threading
+
+    db = tmp_path / "dur.db"
+    port = 5601
+
+    def sender():
+        time.sleep(0.4)
+        with sock_mod.socket(sock_mod.AF_INET, sock_mod.SOCK_DGRAM) as sock:
+            sock.sendto(b"Nov 24 15:20:00 daemon.err dhcpd: no free leases", ("127.0.0.1", port))
+
+    threading.Thread(target=sender, daemon=True).start()
+    assert main(["listen", "--port", str(port), "--bind", "127.0.0.1", "--db", str(db), "--duration", "1.5"]) == 0
+    with Store(db) as store:
+        assert store.count() == 1
+
+
+def test_no_web_never_returns_external_references(tmp_path):
+    db = tmp_path / "n.db"
+    assert main(["ingest", "--file", str(_log_file(tmp_path)), "--db", str(db), "--source-ip", "192.168.1.1"]) == 0
+    from syslogwatch.cli import build_report
+
+    with Store(db) as store:
+        report = build_report(store, since=None, top=5, use_web=False, min_score=0, db_path=db)
+    assert all(ref.source == "catalogo" for f in report.findings for ref in f.references)
+
+
+def test_commands_require_their_arguments():
+    with pytest.raises(SystemExit):
+        main([])  # sin subcomando
+    with pytest.raises(SystemExit):
+        main(["ingest"])  # sin --file
+
+
+def _log_file(tmp_path):
+    path = tmp_path / "log.txt"
+    path.write_text(
+        "Nov 24 15:20:00 kern.crit kernel: Out of memory: Killed process 9\n"
+        "Nov 24 15:20:01 daemon.err dhcpd: no free leases\n",
+        encoding="utf-8",
+    )
+    return path

@@ -121,15 +121,15 @@ Estado medido en el sandbox (Python 3.13, verificado el 24-nov-2026):
 
 | Gate | Resultado |
 | --- | --- |
-| pytest | 136 tests, cobertura 95 % |
+| pytest | 140 tests, cobertura 95 % |
 | crapper | peor CRAP 8.0 (umbral 10) |
 | dryer | 0 duplicados ≥ 0.82 |
-| mutator | 100 % de mutantes muertos en `parse`, `rank` y `rules` (56/56) |
+| mutator | 195/207 mutantes muertos (94 %); 100 % en `parse`, `rank` y `rules` |
 
-En la capa de entrada/salida (`cli`, `store`, `sources`, `report`) sobreviven ~1 de
-cada 4 mutantes: son contadores, banderas de arranque y comparaciones cuyo cambio
-no altera ninguna salida observable. Ahí el gate que manda es la cobertura (≥ 92 %
-en todos esos módulos) y los tests de comportamiento de arriba.
+Los 12 supervivientes están en la capa de E/S: inicializaciones de banderas
+(`_running`, `degraded`), contadores que nadie observa, el `start=1` de una tabla
+y comparaciones cuyo cambio no altera ninguna salida. Ahí el gate que manda es la
+cobertura (≥ 92 % en todos esos módulos) y los tests de comportamiento.
 
 ## Añadir patrones
 
